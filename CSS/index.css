@@ -34,25 +34,26 @@ body {
 .wavy-card-wrapper svg {
   display: block;
   width: 100%;
-  height: 280px;
+  height: 100vh;
 }
 
 .wavy-content {
   position: absolute;
-  bottom: 30px;
-  left: auto;
-  right: 5%;
+  top: 68%;
+  right: 1%;
+  transform: translateY(-50%);
+  width: 400px;
   z-index: 2;
-  color: #000000;
+  color: #000;
 }
 
 .wavy-content h1 {
-  font-size: 1.5rem;
+  font-size: 2rem;
   margin-bottom: 0.5rem;
 }
 
 .wavy-content h2 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   line-height: 1.2;
   margin-bottom: 0.8rem;
 }
@@ -67,11 +68,9 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(15, 23, 42, 0.35);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  margin: 20px;
+  background: transparent;
+  border-bottom: 2px solid whitesmoke;
+  margin: 10px;
   padding: 12px 30px;
   z-index: 10;
 }
@@ -93,7 +92,7 @@ nav {
   font-size: 1em;
   font-weight: 600;
   padding: 8px 16px;
-  border-radius: 10px;
+  border-radius: 15px;
   transition: all 0.3s ease;
 }
 
@@ -106,7 +105,7 @@ nav {
   gap: 12px;
 }
 
-.RLButton {
+.LButton {
   color: #ffffff;
   text-decoration: none;
   font-weight: 700;
@@ -116,37 +115,25 @@ nav {
   transition: all 0.3s ease;
 }
 
-.RLButton:hover {
+.LButton:hover {
   background-color: #ffffff;
-  color: #2563eb;
-}
-
-.register-btn {
-  background-color: #ff5722;
-  border-color: #ff5722;
-}
-
-.register-btn:hover {
-  background-color: #e64a19;
-  color: #ffffff;
+  color: #c65b57;
 }
 
 .btn-more {
-  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #c65b57;
   color: #ffffff;
-  padding: 12px 30px;
-  border-radius: 25px;
   text-decoration: none;
-  font-weight: 700;
-  box-shadow: 0 8px 15px rgba(37, 99, 235, 0.3);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .btn-more:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 20px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 12px 20px rgba(247, 231, 65, 0.4);
 }
 
 @media (max-width: 768px) {
