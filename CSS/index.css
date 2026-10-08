@@ -42,7 +42,7 @@ body {
   top: 68%;
   right: 1%;
   transform: translateY(-50%);
-  width: 400px;
+  width: 410px;
   z-index: 2;
   color: #000;
 }
@@ -53,15 +53,31 @@ body {
 }
 
 .wavy-content h2 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   line-height: 1.2;
   margin-bottom: 0.8rem;
 }
 
 .wavy-content p {
   max-width: 500px;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
   font-size: 1rem;
+}
+
+.typing-title {
+  min-height: 1.5rem;
+}
+
+.typed-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
 }
 
 nav {
