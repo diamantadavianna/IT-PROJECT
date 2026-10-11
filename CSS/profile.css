@@ -1,0 +1,40 @@
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chip {
+  display: inline-block;
+  margin: 0;
+  cursor: pointer;
+}
+
+.chip input {
+  display: none;
+}
+
+.chip span {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.chip:hover span {
+  border-color: #6c63ff;
+}
+
+.chip input:checked + span {
+  background: #6c63ff;
+  border-color: #6c63ff;
+  color: #fff;
+}
+
+#otherBox {
+  margin-top: 10px;
+}

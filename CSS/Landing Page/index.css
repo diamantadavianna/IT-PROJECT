@@ -14,7 +14,7 @@ body {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background: url("../Gambar/download\ \(1\).gif") no-repeat bottom center /
+  background: url("../../Gambar/download\ \(1\).gif") no-repeat bottom center /
     cover;
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@ body {
 :root[data-theme="dark"] .hero-container::before {
   content: "";
   position: absolute;
-  background: url("../Gambar/_pixel_\ GIFs\ -\ the\ best\ GIFs\ on\ GIFER.gif")
+  background: url("../../Gambar/_pixel_\ GIFs\ -\ the\ best\ GIFs\ on\ GIFER.gif")
     no-repeat bottom center / cover;
   inset: 0;
   z-index: 0;

@@ -35,7 +35,7 @@ googleLoginButton.addEventListener("click", async () => {
     console.log("Email:", user.email);
     console.log("UID:", user.uid);
 
-    window.location.href = "home.html";
+    window.location.href = "../HTML/profile.html";
   } catch (error) {
     console.error(error);
     alert(error.code);
