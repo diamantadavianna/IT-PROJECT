@@ -8,82 +8,74 @@
   </head>
   <body>
     <main class="card">
-      <h1>Profil</h1>
-      <p class="sub">
-        Ceritakan tentang dirimu supaya teman sehobi bisa menemukanmu
-      </p>
-      <div class="avatar" id="avatar">
-        <img src="../Gambar/blank profile.jpeg" alt="Avatar" id="avatarImage" />
-      </div>
       <form id="profileForm">
-        <label for="displayName">Nama tampilan</label>
-        <input type="text" id="displayName" maxlength="40" required />
-        <fieldset class="gender-group">
-          <legend>Jenis kelamin</legend>
-
-          <label for="gender-male">
-            <input
-              type="radio"
-              id="gender-male"
-              name="gender"
-              value="Laki-laki"
-              required
-            />
-            Laki-laki
-          </label>
-
-          <label for="gender-female">
-            <input
-              type="radio"
-              id="gender-female"
-              name="gender"
-              value="Perempuan"
-            />
-            Perempuan
-          </label>
-
-          <label for="gender-private">
-            <input
-              type="radio"
-              id="gender-private"
-              name="gender"
-              value="Tidak disebutkan"
-            />
-            Tidak ingin mengungkapkan
-          </label>
-        </fieldset>
-        <label for="age">Umur</label>
-        <input type="number" id="age" min="10" max="25" />
-        <label for="city">Kota</label>
-        <input type="text" id="city" maxlength="40" />
-        <label for="bio">Bio</label>
-        <textarea
-          id="bio"
-          rows="3"
-          maxlength="200"
-          placeholder="Ceritakan sedikit tentang dirimu..."
-        ></textarea>
-        <label>Hobi / minat / bakat</label>
-        <small>Pilih sebanyak yang kamu suka</small>
-
-        <div class="chips" id="interestList"></div>
-
-        <div class="chips">
-          <label class="chip">
-            <input type="checkbox" id="otherCheck" />
-            <span>Lainnya</span>
-          </label>
+        <div class="progress">
+          <div class="progress-bar" id="progressBar"></div>
         </div>
+        <p class="step-label" id="stepLabel"></p>
 
-        <div id="otherBox" hidden>
-          <input
-            type="text"
-            id="otherInput"
-            maxlength="60"
-            placeholder="Ketik hobimu (maks. 3, pisahkan dengan koma)"
-          />
+        <section class="step" data-step="1">
+          <h1>Profil</h1>
+          <h2>Data diri</h2>
+          <label for="displayName">Nama asli</label>
+          <input type="text" id="displayName" maxlength="40" required />
+          <label>Jenis kelamin</label>
+          <div class="radio-row">
+            <label class="radio"
+              ><input type="radio" name="gender" value="laki-laki" />
+              Laki-laki</label
+            >
+            <label class="radio"
+              ><input type="radio" name="gender" value="perempuan" />
+              Perempuan</label
+            >
+          </div>
+          <label for="age">Umur</label>
+          <input type="number" id="age" min="14" max="17" />
+
+          <label for="city">Kota</label>
+          <input type="text" id="city" maxlength="40" />
+        </section>
+
+        <section class="step" data-step="2">
+          <h1>Profil</h1>
+          <h2>Tentang kamu</h2>
+          <label for="bio">Bio</label>
+          <textarea
+            id="bio"
+            rows="4"
+            maxlength="200"
+            placeholder="Ceritakan sedikit tentang dirimu..."
+          ></textarea>
+        </section>
+
+        <section class="step" data-step="3">
+          <h1>Profil</h1>
+          <h2>Hobi & minat</h2>
+          <small>Pilih sebanyak yang kamu suka</small>
+          <div class="chips" id="interestList"></div>
+          <div class="chips">
+            <label class="chip">
+              <input type="checkbox" id="otherCheck" />
+              <span>Lainnya</span>
+            </label>
+          </div>
+          <div id="otherBox" hidden>
+            <input
+              type="text"
+              id="otherInput"
+              maxlength="60"
+              placeholder="Ketik hobimu (maks. 3, pisahkan dengan koma)"
+            />
+          </div>
+        </section>
+
+        <div class="nav-buttons">
+          <button type="button" id="prevBtn" class="secondary">Kembali</button>
+          <button type="button" id="nextBtn">Lanjut</button>
+          <!-- <button type="submit" id="saveBtn">Simpan Profil</button> -->
+          <a href="../HTML/Home Page/match.html" id="saveBtn">Cari Teman</a>
         </div>
-        <button type="submit" id="saveBtn">Simpan Profil</button>
         <p id="message"></p>
       </form>
     </main>

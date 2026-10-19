@@ -1,54 +1,12 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getAuth,
-  onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  getFirestore,
   doc,
   getDoc,
   setDoc,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyA2ebT051AvRSELCp-j3k23yziMKPRFrAk",
-  authDomain: "it-project-2becd.firebaseapp.com",
-  projectId: "it-project-2becd",
-  storageBucket: "it-project-2becd.firebasestorage.app",
-  messagingSenderId: "113493120104",
-  appId: "1:113493120104:web:0c12cf14774f7998afd7dd",
-  measurementId: "G-GP6JJ3HKNS",
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-const INTEREST_OPTIONS = [
-  { id: "Musik", label: "Main musik" },
-  { id: "menyanyi", label: "Menyanyi" },
-  { id: "menggambar", label: "Menggambar" },
-  { id: "menulis", label: "Menulis" },
-  { id: "membaca", label: "Membaca buku" },
-  { id: "belajar", label: "Belajar" },
-  { id: "fotografi", label: "Fotografi" },
-  { id: "basket", label: "Basket" },
-  { id: "sepakbola", label: "Futsal" },
-  { id: "badminton", label: "Badminton" },
-  { id: "voli", label: "Voli" },
-  { id: "floorball", label: "Floorball" },
-  { id: "padel", label: "Padel" },
-  { id: "renang", label: "Renang" },
-  { id: "gaming", label: "Gaming" },
-  { id: "coding", label: "Coding" },
-  { id: "robotik", label: "Robotik" },
-  { id: "desain", label: "Desain grafis" },
-  { id: "film", label: "Menonton film" },
-  { id: "memasak", label: "Memasak" },
-  { id: "traveling", label: "Traveling" },
-  { id: "dance", label: "Dance" },
-];
+import { auth, db } from "./firebase-config.js";
+import { INTEREST_OPTIONS } from "./interest.js";
 
 const form = document.getElementById("profileForm");
 const message = document.getElementById("message");
@@ -123,7 +81,6 @@ async function loadProfile() {
     document.getElementById("city").value = data.city || "";
     document.getElementById("bio").value = data.bio || "";
 
-    // Gender
     if (data.gender) {
       const genderRadio = document.querySelector(
         `input[name="gender"][value="${data.gender}"]`,
@@ -153,6 +110,10 @@ nameInput.addEventListener("input", updateAvatar);
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+  if (currentStep < totalSteps) {
+    nextBtn.click();
+    return;
+  }
 
   const interests = [...interestList.querySelectorAll("input:checked")].map(
     (cb) => cb.value,
@@ -197,7 +158,7 @@ form.addEventListener("submit", async (e) => {
     );
 
     message.style.color = "green";
-    message.textContent = "Profil berhasil disimpan! ✅";
+    message.textContent = "Profil berhasil disimpan!";
   } catch (err) {
     console.error(err);
     message.style.color = "red";
@@ -205,3 +166,41 @@ form.addEventListener("submit", async (e) => {
   }
   saveBtn.disabled = false;
 });
+
+const steps = document.querySelectorAll(".step");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const progressBar = document.getElementById("progressBar");
+const stepLabel = document.getElementById("stepLabel");
+const totalSteps = steps.length;
+let currentStep = 1;
+
+function showStep(n) {
+  currentStep = n;
+  steps.forEach((s) =>
+    s.classList.toggle("active", Number(s.dataset.step) === n),
+  );
+  prevBtn.hidden = n === 1;
+  nextBtn.hidden = n === totalSteps;
+  saveBtn.hidden = n !== totalSteps;
+  progressBar.style.width = (n / totalSteps) * 100 + "%";
+  stepLabel.textContent = `Langkah ${n} dari ${totalSteps}`;
+  message.textContent = "";
+}
+
+function validateStep(n) {
+  const fields = document.querySelectorAll(
+    `.step[data-step="${n}"] input, .step[data-step="${n}"] textarea`,
+  );
+  for (const f of fields) {
+    if (!f.reportValidity()) return false;
+  }
+  return true;
+}
+
+nextBtn.addEventListener("click", () => {
+  if (validateStep(currentStep)) showStep(currentStep + 1);
+});
+prevBtn.addEventListener("click", () => showStep(currentStep - 1));
+
+showStep(1);

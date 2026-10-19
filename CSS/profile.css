@@ -1,3 +1,84 @@
+[hidden] {
+  display: none !important;
+}
+
+.progress {
+  height: 8px;
+  background: #eee;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: #6c63ff;
+  border-radius: 999px;
+  transition: width 0.3s;
+}
+.step-label {
+  font-size: 13px;
+  color: #888;
+  margin: 8px 0 0;
+  text-align: right;
+}
+
+.step {
+  display: none;
+}
+.step.active {
+  display: block;
+  animation: fadeIn 0.25s;
+}
+.step h2 {
+  margin: 16px 0 0;
+  font-size: 20px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gender */
+.radio-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-weight: 500;
+  cursor: pointer;
+}
+.radio input {
+  width: auto;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+.nav-buttons button {
+  flex: 1;
+}
+button.secondary {
+  background: #eee;
+  color: #333;
+}
+button.secondary:hover {
+  background: #ddd;
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;
