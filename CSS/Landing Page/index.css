@@ -139,6 +139,11 @@ nav {
 .nav-links a:hover {
   background-color: rgba(255, 255, 255, 0.2);
   cursor: pointer;
+  box-shadow: 0 12px 20px rgba(182, 84, 71, 0.934);
+}
+
+:root[data-theme="dark"] .nav-links a:hover {
+  box-shadow: 0 12px 20px rgba(92, 193, 222, 0.934);
 }
 
 .nav-auth {
@@ -160,6 +165,11 @@ nav {
 .LButton:hover {
   background-color: #ffffff;
   color: #c65b57;
+}
+
+:root[data-theme="dark"] .LButton:hover {
+  background-color: #5cc1de;
+  color: #1e293b;
 }
 
 .btn-more {
