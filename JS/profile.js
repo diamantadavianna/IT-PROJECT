@@ -159,6 +159,11 @@ form.addEventListener("submit", async (e) => {
 
     message.style.color = "green";
     message.textContent = "Profil berhasil disimpan!";
+    message.style.color = "green";
+    message.textContent = "Profil berhasil disimpan! Mengalihkan...";
+    setTimeout(() => {
+      window.location.href = "../HTML/Home Page/match.html";
+    }, 1000);
   } catch (err) {
     console.error(err);
     message.style.color = "red";

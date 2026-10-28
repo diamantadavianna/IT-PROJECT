@@ -12,7 +12,16 @@ body {
   align-items: center;
   background: url("../Gambar/download\ \(1\).gif") no-repeat bottom center /
     cover;
-  backdrop-filter: blur(5px);
+}
+
+:root[data-theme="dark"] .login-container::before {
+  content: "";
+  position: absolute;
+  background: url("../../Gambar/_pixel_\ GIFs\ -\ the\ best\ GIFs\ on\ GIFER.gif")
+    no-repeat bottom center / cover;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .login-container {
@@ -31,10 +40,20 @@ body {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
 }
 
+:root[data-theme="dark"] .login-card {
+  position: relative;
+  z-index: 1;
+  background: #152339;
+}
+
 .login-card h1 {
   color: #c65b57;
   font-size: 2rem;
   margin-bottom: 30px;
+}
+
+:root[data-theme="dark"] .login-card h1 {
+  color: rgba(92, 193, 222, 0.934);
 }
 
 .login-card h2 {
@@ -42,10 +61,18 @@ body {
   margin-bottom: 10px;
 }
 
+:root[data-theme="dark"] .login-card h2 {
+  color: whitesmoke;
+}
+
 .login-card p {
   color: #666;
   line-height: 1.6;
   margin-bottom: 30px;
+}
+
+:root[data-theme="dark"] .login-card p {
+  color: rgba(226, 239, 242, 0.934);
 }
 
 #google-login-btn {
@@ -64,10 +91,21 @@ body {
   transition: 0.3s;
 }
 
+:root[data-theme="dark"] .login-card #google-login-btn {
+  background: #1e2a3b;
+  color: whitesmoke;
+  border-color: rgba(92, 193, 222, 0.934);
+}
+
 #google-login-btn:hover {
   background: #f7f7f7;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="dark"] .login-card #google-login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px whitesmoke;
 }
 
 #google-login-btn img {

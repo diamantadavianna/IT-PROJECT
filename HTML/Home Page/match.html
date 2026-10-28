@@ -4,6 +4,41 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Match Interest</title>
+    <link rel="stylesheet" href="../../CSS/Home Page/match.css" />
   </head>
-  <body></body>
+  <body>
+    <main class="card">
+      <h1>Cari Teman</h1>
+      <p class="sub">
+        Kamu akan dicocokkan dengan orang yang punya hobi sama. Kalian berdua
+        tetap anonim.
+      </p>
+
+      <p class="alias" id="aliasText">...</p>
+      <div class="chips" id="myInterests"></div>
+
+      <section id="idleBox">
+        <button type="button" id="findBtn">Cari Teman</button>
+        <a class="link" href="../profile.html">Ubah profil / hobi</a>
+      </section>
+
+      <section id="searchingBox" hidden>
+        <div class="spinner"></div>
+        <p>Mencari teman dengan hobi yang sama...</p>
+        <p class="sub">Jangan tutup halaman ini ya</p>
+        <button type="button" id="cancelBtn" class="secondary">Batalkan</button>
+      </section>
+
+      <section id="resultBox" hidden>
+        <h2>Ketemu!</h2>
+        <p>Kamu cocok dengan <strong id="partnerAlias"></strong></p>
+        <p class="sub" id="sharedText"></p>
+        <div class="chips" id="sharedChips"></div>
+        <a class="btn" id="chatLink" href="#">Mulai Chat</a>
+      </section>
+
+      <p id="message"></p>
+    </main>
+    <script type="module" src="../../JS/match.js"></script>
+  </body>
 </html>
