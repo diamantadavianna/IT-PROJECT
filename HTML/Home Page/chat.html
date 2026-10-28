@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chat - Interest Connect</title>
+    <link rel="stylesheet" href="../../CSS/Home Page/chat.css" />
+  </head>
+  <body>
+    <main class="chat">
+      <header class="chat-header">
+        <div class="chat-avatar">🙂</div>
+        <div>
+          <strong id="partnerName">Memuat...</strong>
+          <small>Anonim</small>
+        </div>
+      </header>
+
+      <div class="messages" id="messages"></div>
+
+      <p class="error" id="errorMsg"></p>
+
+      <form class="chat-form" id="chatForm" hidden>
+        <input
+          type="text"
+          id="messageInput"
+          maxlength="500"
+          placeholder="Tulis pesan..."
+          autocomplete="off"
+        />
+        <button type="submit">Kirim</button>
+      </form>
+    </main>
+
+    <script type="module" src="../../JS/chat.js"></script>
+  </body>
+</html>
