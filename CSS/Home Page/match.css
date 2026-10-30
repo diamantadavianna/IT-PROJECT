@@ -59,3 +59,13 @@
   font-size: 14px;
   color: #6c63ff;
 }
+
+.notice {
+  background: #fff7e6;
+  color: #8a5a00;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 14px 0;
+}

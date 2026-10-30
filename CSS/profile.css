@@ -119,3 +119,115 @@ button.secondary:hover {
 #otherBox {
   margin-top: 10px;
 }
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url("../Gambar/download\ \(1\).gif") no-repeat bottom center /
+    cover;
+}
+
+:root[data-theme="dark"] .step::before {
+  content: "";
+  position: absolute;
+  background: url("../../Gambar/_pixel_\ GIFs\ -\ the\ best\ GIFs\ on\ GIFER.gif")
+    no-repeat bottom center / cover;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.step {
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
+  padding: 45px 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  border-color: #888;
+  border-width: 1px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="dark"] .step {
+  position: relative;
+  z-index: 1;
+  background: #152339;
+}
+
+.step h1 {
+  color: #c65b57;
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+:root[data-theme="dark"] .step h1 {
+  color: rgba(92, 193, 222, 0.934);
+}
+
+.step h2 {
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+}
+
+:root[data-theme="dark"] .step h2 {
+  color: whitesmoke;
+}
+
+.step label {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+:root[data-theme="dark"] .step label {
+  color: rgba(226, 239, 242, 0.934);
+}
+
+#google-login-btn {
+  width: 100%;
+  padding: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+:root[data-theme="dark"] .login-card #google-login-btn {
+  background: #1e2a3b;
+  color: whitesmoke;
+  border-color: rgba(92, 193, 222, 0.934);
+}
+
+#google-login-btn:hover {
+  background: #f7f7f7;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="dark"] .login-card #google-login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px whitesmoke;
+}
+
+#google-login-btn img {
+  width: 22px;
+  height: 22px;
+}

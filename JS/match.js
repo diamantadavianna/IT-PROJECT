@@ -29,6 +29,10 @@ const sharedChips = document.getElementById("sharedChips");
 const chatLink = document.getElementById("chatLink");
 const message = document.getElementById("message");
 
+const waitNotice = document.getElementById("waitNotice");
+const NOTICE_DELAY = 10000; // 10 detik, boleh diubah
+let noticeTimer = null;
+
 let currentUser = null;
 let myAlias = null;
 let myInterests = [];
@@ -83,7 +87,17 @@ async function loadMyProfile() {
 
   aliasText.textContent = myAlias;
   addTags(myInterestsBox, myInterests);
+
   await checkLeftover();
+  if (!resultBox.hidden) return; // hasil sudah ditampilkan oleh checkLeftover
+
+  // Kalau sudah punya chat, langsung tampilkan (tanpa tombol Cari Teman)
+  const existingChatId = await findExistingChat();
+  if (existingChatId) {
+    await showMatch(existingChatId);
+    document.querySelector("#resultBox h2").textContent =
+      "Kamu sudah punya teman chat 💬";
+  }
 }
 
 // Kalau tab sempat ditutup saat menunggu, cek apakah ternyata sudah dicocokkan
@@ -99,6 +113,25 @@ async function checkLeftover() {
   } else {
     await deleteDoc(ref); // sisa antrean lama
   }
+}
+
+// Cari chat yang sudah pernah dibuat untuk user ini
+async function findExistingChat() {
+  const snap = await getDocs(
+    query(
+      collection(db, "chats"),
+      where("members", "array-contains", currentUser.uid),
+    ),
+  );
+  if (snap.empty) return null;
+
+  // Kalau ada lebih dari satu, ambil yang paling baru
+  let latest = null;
+  snap.forEach((d) => {
+    const t = d.data().createdAt ? d.data().createdAt.toMillis() : 0;
+    if (!latest || t > latest.time) latest = { id: d.id, time: t };
+  });
+  return latest.id;
 }
 
 // ====== PENCOCOKAN ======
@@ -178,6 +211,11 @@ async function startSearch() {
   message.textContent = "";
   showBox("searching");
 
+  waitNotice.hidden = true;
+  noticeTimer = setTimeout(() => {
+    if (searching) waitNotice.hidden = false;
+  }, NOTICE_DELAY);
+
   try {
     // 1. Coba langsung cocokkan dengan yang sudah menunggu
     const chatId = await tryMatch();
@@ -228,8 +266,11 @@ async function startSearch() {
 function stopSearchTimers() {
   if (pollTimer) clearInterval(pollTimer);
   if (unsubscribeWait) unsubscribeWait();
+  if (noticeTimer) clearTimeout(noticeTimer);
   pollTimer = null;
   unsubscribeWait = null;
+  noticeTimer = null;
+  waitNotice.hidden = true;
 }
 
 async function onMatched(chatId) {
