@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home - Interest Connect</title>
+    <link rel="stylesheet" href="../../CSS/Home Page/home.css" />
+  </head>
+  <body>
+    <main class="card">
+      <header class="home-header">
+        <div>
+          <small>Halo,</small>
+          <h1 id="aliasText">...</h1>
+        </div>
+        <button type="button" id="logoutBtn" class="ghost">Keluar</button>
+      </header>
+
+      <nav class="menu">
+        <a class="menu-item" href="match.html">Cari Teman Baru</a>
+        <a class="menu-item" href="../profile.html">Profil Saya</a>
+      </nav>
+
+      <section>
+        <h2>Teman Chat</h2>
+        <div class="friend-list" id="friendList"></div>
+        <p class="empty" id="emptyState" hidden>
+          Belum ada teman. Klik "Cari Teman Baru" untuk mulai!
+        </p>
+      </section>
+
+      <section>
+        <h2>Komunitas Belajar</h2>
+        <div class="coming-soon">
+          Segera hadir: buat grup belajar bareng temanmu (minimal 3 orang).
+        </div>
+      </section>
+
+      <p id="message"></p>
+    </main>
+    <script type="module" src="../../JS/home.js"></script>
+  </body>
+</html>

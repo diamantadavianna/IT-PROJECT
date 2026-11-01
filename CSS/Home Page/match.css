@@ -1,3 +1,7 @@
+[hidden] {
+  display: none !important;
+}
+
 .alias {
   text-align: center;
   font-weight: 700;
@@ -16,7 +20,7 @@
   padding: 6px 12px;
   border-radius: 999px;
   background: #efeeff;
-  color: #4b44c9;
+  color: #c65b57;
   font-size: 13px;
   font-weight: 600;
 }

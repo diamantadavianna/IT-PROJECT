@@ -10,8 +10,28 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: url("../Gambar/download\ \(1\).gif") no-repeat bottom center /
+}
+
+.card-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: url("../../Gambar/download\ \(1\).gif") no-repeat bottom center /
     cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+:root[data-theme="dark"] .card-container::before {
+  content: "";
+  position: absolute;
+  background: url("../../Gambar/_pixel_\ GIFs\ -\ the\ best\ GIFs\ on\ GIFER.gif")
+    no-repeat bottom center / cover;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
 [hidden] {

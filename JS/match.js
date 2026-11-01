@@ -39,6 +39,7 @@ let myInterests = [];
 let searching = false;
 let pollTimer = null;
 let unsubscribeWait = null;
+let friendIds = new Set(); // uid orang yang sudah jadi teman
 
 // ====== TAMPILAN ======
 function showBox(name) {
@@ -59,9 +60,10 @@ function addTags(container, ids) {
 }
 
 // ====== LOGIN & PROFIL ======
+// Kalo profil belum lengkap
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "../HTML/login.html";
+    window.location.href = "../login.html";
     return;
   }
   currentUser = user;
@@ -80,7 +82,7 @@ async function loadMyProfile() {
   if (!myAlias || myInterests.length === 0) {
     aliasText.textContent = "Profilmu belum lengkap";
     message.innerHTML =
-      'Isi dan simpan profil dulu ya → <a href="../HTML/profile.html">Isi profil</a>';
+      'Isi dan simpan profil dulu ya → <a href="../profile.html">Isi profil</a>';
     findBtn.disabled = true;
     return;
   }
@@ -88,15 +90,13 @@ async function loadMyProfile() {
   aliasText.textContent = myAlias;
   addTags(myInterestsBox, myInterests);
 
-  await checkLeftover();
-  if (!resultBox.hidden) return; // hasil sudah ditampilkan oleh checkLeftover
-
-  // Kalau sudah punya chat, langsung tampilkan (tanpa tombol Cari Teman)
-  const existingChatId = await findExistingChat();
-  if (existingChatId) {
-    await showMatch(existingChatId);
-    document.querySelector("#resultBox h2").textContent =
-      "Kamu sudah punya teman chat 💬";
+  try {
+    await checkLeftover();
+    await loadFriendIds();
+  } catch (err) {
+    console.error(err);
+    message.style.color = "red";
+    message.textContent = "Gagal memeriksa data: " + err.message;
   }
 }
 
@@ -115,23 +115,20 @@ async function checkLeftover() {
   }
 }
 
-// Cari chat yang sudah pernah dibuat untuk user ini
-async function findExistingChat() {
+// Kumpulkan uid semua orang yang sudah pernah dicocokkan dengan kita
+async function loadFriendIds() {
   const snap = await getDocs(
     query(
       collection(db, "chats"),
       where("members", "array-contains", currentUser.uid),
     ),
   );
-  if (snap.empty) return null;
-
-  // Kalau ada lebih dari satu, ambil yang paling baru
-  let latest = null;
+  friendIds = new Set();
   snap.forEach((d) => {
-    const t = d.data().createdAt ? d.data().createdAt.toMillis() : 0;
-    if (!latest || t > latest.time) latest = { id: d.id, time: t };
+    d.data().members.forEach((m) => {
+      if (m !== currentUser.uid) friendIds.add(m);
+    });
   });
-  return latest.id;
 }
 
 // ====== PENCOCOKAN ======
@@ -145,6 +142,26 @@ async function tryMatch() {
 
   const now = Date.now();
   const candidates = [];
+  console.log("Dokumen di antrean:", snap.size);
+
+  snap.forEach((d) => {
+    if (d.id === currentUser.uid) return;
+    if (d.id === currentUser.uid) return; // bukan diri sendiri
+    if (friendIds.has(d.id)) return; // sudah jadi teman (baris baru)
+    const data = d.data();
+    if (data.matchedChatId) return;
+    const seen = data.lastSeen ? data.lastSeen.toMillis() : now;
+    if (now - seen > 60000) {
+      console.log(
+        "Dilewati (dianggap offline):",
+        d.id,
+        (now - seen) / 1000,
+        "detik",
+      );
+      return;
+    }
+    // ... sisanya tetap
+  });
 
   snap.forEach((d) => {
     if (d.id === currentUser.uid) return; // bukan diri sendiri
@@ -166,6 +183,7 @@ async function tryMatch() {
   candidates.sort(
     (a, b) => b.shared.length - a.shared.length || a.rand - b.rand,
   );
+  console.log("Kandidat cocok:", candidates);
 
   for (const c of candidates) {
     const chatId = await claim(c);
@@ -201,7 +219,9 @@ async function claim(c) {
       return chatRef.id;
     });
   } catch (err) {
-    console.error(err);
+    console.error("Gagal claim:", err);
+    message.style.color = "red";
+    message.textContent = "Gagal mencocokkan: " + err.message;
     return null;
   }
 }
