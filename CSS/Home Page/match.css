@@ -2,6 +2,18 @@
   display: none !important;
 }
 
+.card {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: url("../../Gambar/download\ \(1\).gif") no-repeat bottom center /
+    cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
 .alias {
   text-align: center;
   font-weight: 700;

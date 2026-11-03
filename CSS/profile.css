@@ -7,68 +7,70 @@
 
 body {
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
-.card-container {
+.profile-container {
   position: relative;
   width: 100%;
   min-height: 100vh;
   background: url("../../Gambar/download\ \(1\).gif") no-repeat bottom center /
     cover;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
+  justify-content: center;
+  align-items: center;
 }
 
-:root[data-theme="dark"] .card-container {
+:root[data-theme="dark"] .profile-container {
   background-image: url("../../Gambar/_pixel_\ GIFs\ -\ the\ best\ GIFs\ on\ GIFER.gif");
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 760px;
+  background: white;
+  padding: 40px 48px;
+  border-radius: 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+:root[data-theme="dark"] .profile-card {
+  background: #0f1b2b;
+  border-color: #333;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
 [hidden] {
   display: none !important;
 }
 
-.progress {
-  height: 8px;
-  background: #eee;
-  border-radius: 999px;
-  overflow: hidden;
-  margin-top: 6px;
-}
-.progress-bar {
-  height: 100%;
-  width: 0;
-  background: #c65b57;
-  border-radius: 999px;
-  transition: width 0.3s;
-}
-.step-label {
-  font-size: 13px;
-  color: #888;
-  margin: 8px 0 0;
-  text-align: right;
-}
-
 .step {
   display: none;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: left;
 }
 
-.step {
-  width: 100%;
-  max-width: 420px;
-  margin: auto;
-  padding: 45px 40px;
-  background: whitesmoke;
-  border-radius: 20px;
-  border-color: #888;
-  border-width: 1px;
-  text-align: center;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-  position: relative;
+.step.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+. @keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 :root[data-theme="dark"] .step::before {
@@ -85,15 +87,11 @@ body {
   background: #152339;
 }
 
-.step.active {
-  display: block;
-  animation: fadeIn 0.25s;
-}
-
 .step h1 {
+  text-align: center;
   color: #c65b57;
   font-size: 2rem;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
 }
 
 :root[data-theme="dark"] .step h1 {
@@ -101,110 +99,276 @@ body {
 }
 
 .step h2 {
-  margin: 16px 0 0;
-  font-size: 20px;
-}
-
-.step h2 {
-  font-size: 1.6rem;
-  margin-bottom: 10px;
+  text-align: center;
+  margin-bottom: 20px;
+  color: black;
+  font-size: 1.5rem;
 }
 
 :root[data-theme="dark"] .step h2 {
   color: whitesmoke;
 }
 
+.step small {
+  display: block;
+  color: #c65b57;
+  margin-bottom: 15px;
+  font-size: 13px;
+}
+
 .step label {
-  color: #666;
-  line-height: 1.6;
-  margin-bottom: 30px;
+  display: block;
+  color: black;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 9px;
 }
 
 :root[data-theme="dark"] .step label {
-  color: rgba(226, 239, 242, 0.934);
+  color: rgba(92, 193, 222, 0.934);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.step input:not([type="radio"]):not([type="checkbox"]),
+.step textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 14px 20px;
+  border: 2px solid #c65b57;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.04);
+  color: black;
+  font-size: 14px;
+  outline: none;
+  transition: 0.25s ease;
+}
+.step input::placeholder,
+.step textarea::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+.step input:focus,
+.step textarea:focus {
+  border-color: #c65b57;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(190, 245, 205, 0.12);
+}
+.step textarea {
+  min-height: 130px;
+  border-radius: 20px;
+  resize: vertical;
 }
 
-/* Gender */
+.step[data-step="1"] {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  row-gap: 12px;
+}
+.step[data-step="1"].active {
+  display: grid;
+}
+.step[data-step="1"] h1,
+.step[data-step="1"] h2 {
+  grid-column: 1 / -1;
+}
+.step[data-step="1"] label[for="displayName"] {
+  grid-column: 1;
+  grid-row: 3;
+}
+.step[data-step="1"] #displayName {
+  grid-column: 1;
+  grid-row: 4;
+}
+.step[data-step="1"] > label:not([for]) {
+  grid-column: 2;
+  grid-row: 3;
+}
+.step[data-step="1"] .radio-row {
+  grid-column: 2;
+  grid-row: 4;
+}
+.step[data-step="1"] label[for="age"] {
+  grid-column: 1;
+  grid-row: 5;
+}
+.step[data-step="1"] #age {
+  grid-column: 1;
+  grid-row: 6;
+}
+.step[data-step="1"] label[for="city"] {
+  grid-column: 2;
+  grid-row: 5;
+}
+.step[data-step="1"] #city {
+  grid-column: 2;
+  grid-row: 6;
+}
 .radio-row {
   display: flex;
-  gap: 10px;
+  align-items: center;
   flex-wrap: wrap;
+  gap: 15px;
+  min-height: 48px;
 }
 .radio {
-  display: flex;
+  display: flex !important;
   align-items: center;
-  gap: 6px;
-  margin: 0;
-  font-weight: 500;
+  gap: 7px;
+  margin: 0 !important;
+  color: black !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+
   cursor: pointer;
 }
 .radio input {
-  width: auto;
+  width: 16px;
+  height: 16px;
+  accent-color: #c65b57;
+  cursor: pointer;
 }
 
-.nav-buttons {
-  display: flex;
-  gap: 10px;
-}
-.nav-buttons button {
-  flex: 1;
-}
-button.secondary {
-  background: #eee;
-  color: #333;
-}
-button.secondary:hover {
-  background: #ddd;
+.step[data-step="2"] label {
+  margin-bottom: 10px;
 }
 
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 12px;
 }
-
 .chip {
-  display: inline-block;
-  margin: 0;
+  display: inline-block !important;
+  margin: 0 !important;
   cursor: pointer;
 }
-
 .chip input {
   display: none;
 }
-
 .chip span {
   display: inline-block;
-  padding: 8px 14px;
-  border: 1.5px solid #ddd;
-  border-radius: 999px;
-  font-size: 14px;
+  padding: 10px 18px;
+  border: 1.5px solid #c65b57;
+  border-radius: 50px;
+  color: #c65b57;
+  font-size: 13px;
   font-weight: 500;
-  transition: all 0.15s;
+  transition: 0.2s ease;
 }
-
 .chip:hover span {
-  border-color: #6c63ff;
+  background: rgba(225, 123, 113, 0.975);
+  border-color: #c65b57;
 }
-
 .chip input:checked + span {
-  background: #6c63ff;
-  border-color: #6c63ff;
-  color: #fff;
+  background: rgba(225, 123, 113, 0.975);
+  border-color: #c65b57;
+  color: black;
+}
+#otherBox {
+  margin-top: 15px;
+}
+#otherBox input {
+  border-radius: 50px;
 }
 
-#otherBox {
-  margin-top: 10px;
+.nav-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+}
+.nav-buttons button {
+  flex: 1;
+  min-height: 48px;
+  border: none;
+  border-radius: 50px;
+  background: #c65b57;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+.nav-buttons button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+.nav-buttons button:active {
+  transform: scale(0.98);
+}
+button.secondary {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid #c65b57;
+  color: #c65b57;
+}
+button.secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.progress {
+  height: 7px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  overflow: hidden;
+  margin-top: 25px;
+}
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: #c65b57;
+  border-radius: 50px;
+  transition: width 0.35s ease;
+}
+.step-label {
+  font-size: 12px;
+  color: #c65b57;
+  margin: 10px 0 0;
+  text-align: right;
+}
+
+#message {
+  color: #c65b57;
+  font-size: 13px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .profile-container {
+    padding: 20px 14px;
+  }
+  .profile-card {
+    padding: 30px 22px;
+    border-radius: 22px;
+  }
+  .step h1 {
+    font-size: 25px;
+  }
+  .step h2 {
+    font-size: 19px;
+    margin-bottom: 24px;
+  }
+  .step[data-step="1"] {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+  .step[data-step="1"] h1,
+  .step[data-step="1"] h2,
+  .step[data-step="1"] label,
+  .step[data-step="1"] input,
+  .step[data-step="1"] .radio-row {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .step[data-step="1"] label:not(:first-child) {
+    margin-top: 8px;
+  }
+  .radio-row {
+    min-height: 40px;
+  }
+  .nav-buttons {
+    gap: 8px;
+  }
+  .nav-buttons button {
+    font-size: 12px;
+  }
 }
