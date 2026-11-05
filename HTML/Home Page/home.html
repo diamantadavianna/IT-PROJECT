@@ -3,42 +3,228 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home - Interest Connect</title>
+    <title>Interest Connect</title>
     <link rel="stylesheet" href="../../CSS/Home Page/home.css" />
-    <script src="../../JS/theme.js"></script>
   </head>
   <body>
-    <main class="card">
-      <header class="home-header">
-        <div>
-          <small>Halo,</small>
-          <h1 id="aliasText">...</h1>
+    <div class="app">
+      <!-- ===== KOLOM 1: SIDEBAR ===== -->
+      <aside class="sidebar">
+        <div class="me">
+          <div class="me-avatar">
+            <img src="../../Gambar/blank profile.jpeg" alt="Avatar Saya" />
+          </div>
+          <strong id="aliasText">...</strong>
+          <small>Anonim</small>
         </div>
-        <button type="button" id="logoutBtn" class="ghost">Keluar</button>
-      </header>
 
-      <nav class="menu">
-        <a class="menu-item" href="match.html">Cari Teman Baru</a>
-        <a class="menu-item" href="../profile.html">Profil Saya</a>
-      </nav>
+        <nav class="side-menu">
+          <button type="button" class="side-item active" id="menuChat">
+            💬 Chat
+          </button>
+          <button type="button" class="side-item" id="menuMatch">
+            🔍 Cari Teman Baru
+          </button>
+          <a class="side-item" href="../profile.html">👤 Profil Saya</a>
+          <button type="button" class="side-item" id="menuCommunity">
+            📚 Komunitas
+          </button>
+        </nav>
 
-      <section>
-        <h2>Teman Chat</h2>
+        <button type="button" id="logoutBtn" class="logout">Keluar</button>
+      </aside>
+
+      <!-- ===== KOLOM 2: DAFTAR TEMAN ===== -->
+      <section class="list-panel">
+        <div class="list-header">
+          <h2>Teman Chat</h2>
+          <input
+            type="search"
+            id="searchInput"
+            placeholder="Cari teman..."
+            autocomplete="off"
+          />
+        </div>
         <div class="friend-list" id="friendList"></div>
         <p class="empty" id="emptyState" hidden>
-          Belum ada teman. Klik "Cari Teman Baru" untuk mulai!
+          Belum ada teman.<br />Klik "Cari Teman Baru" untuk mulai!
         </p>
       </section>
 
-      <section>
-        <h2>Komunitas Belajar</h2>
-        <div class="coming-soon">
-          Segera hadir: buat grup belajar bareng temanmu (minimal 3 orang).
+      <!-- ===== KOLOM 2 (versi komunitas) ===== -->
+      <section class="list-panel" id="communityPanel" hidden>
+        <div class="list-header">
+          <h2>Komunitas Belajar</h2>
+          <p class="sub">Belajar bareng teman-temanmu</p>
         </div>
+        <div class="group-grid" id="groupGrid"></div>
+        <p class="empty" id="groupEmpty" hidden>
+          Belum ada komunitas.<br />Klik tombol + untuk membuat!
+        </p>
       </section>
 
-      <p id="message"></p>
-    </main>
+      <!-- ===== KOLOM 3: PANEL KANAN ===== -->
+      <section class="main-panel">
+        <!-- Tampilan 1: belum pilih teman -->
+        <div class="view empty-view" id="viewEmpty">
+          <div class="big">💬</div>
+          <h3>Pilih teman untuk mulai ngobrol</h3>
+          <p>Atau cari teman baru dengan hobi yang sama.</p>
+        </div>
+
+        <!-- Tampilan 2: chat -->
+        <div class="view" id="viewChat" hidden>
+          <header class="chat-header">
+            <div class="friend-avatar">
+              <img src="../../Gambar/blank profile.jpeg" alt="Avatar Teman" />
+            </div>
+            <div>
+              <strong id="chatPartner"></strong>
+              <small>Anonim</small>
+            </div>
+          </header>
+
+          <div class="messages" id="chatMessages"></div>
+          <p class="error" id="chatError"></p>
+
+          <form class="chat-form" id="chatForm">
+            <input
+              type="text"
+              id="messageInput"
+              maxlength="500"
+              placeholder="Tulis pesan..."
+              autocomplete="off"
+            />
+            <button type="submit">Kirim</button>
+          </form>
+        </div>
+
+        <!-- Tampilan 3: cari teman baru -->
+        <div class="view match-view" id="viewMatch" hidden>
+          <div class="match-card">
+            <h2>Cari Teman Baru</h2>
+            <p class="sub">
+              Kamu akan dicocokkan dengan orang yang punya hobi sama. Kalian
+              berdua tetap anonim.
+            </p>
+            <div class="tags" id="myInterests"></div>
+
+            <section id="idleBox">
+              <button type="button" id="findBtn" class="btn-primary">
+                Cari Teman
+              </button>
+              <a class="link" href="../profile.html">Ubah profil / hobi</a>
+            </section>
+
+            <section id="searchingBox" hidden>
+              <div class="spinner"></div>
+              <p>Mencari teman dengan hobi yang sama...</p>
+              <p class="sub">
+                Kamu boleh pindah menu. Pencarian tetap jalan selama halaman ini
+                terbuka.
+              </p>
+              <p class="notice" id="waitNotice" hidden>
+                Maaf, belum ada orang dengan hobi yang sama yang sedang online
+                😔 Kamu tetap ada di antrean dan akan otomatis dicocokkan begitu
+                ada yang cocok.
+              </p>
+              <button type="button" id="cancelBtn" class="btn-secondary">
+                Batalkan
+              </button>
+            </section>
+
+            <section id="resultBox" hidden>
+              <h3>Ketemu! 🎉</h3>
+              <p>Kamu cocok dengan <strong id="partnerAlias"></strong></p>
+              <p class="sub" id="sharedText"></p>
+              <div class="tags" id="sharedChips"></div>
+              <button type="button" id="openChatBtn" class="btn-primary">
+                Buka Chat
+              </button>
+              <button type="button" id="searchAgainBtn" class="btn-secondary">
+                Cari teman lagi
+              </button>
+            </section>
+
+            <p id="matchMessage"></p>
+          </div>
+        </div>
+
+        <!-- Komunitas: belum pilih -->
+        <div class="view empty-view" id="viewGroupEmpty" hidden>
+          <div class="big">📚</div>
+          <h3>Pilih komunitas atau buat yang baru</h3>
+          <p>Klik tombol bulat di sebelah kiri.</p>
+        </div>
+
+        <!-- Komunitas: buat baru -->
+        <div class="view match-view" id="viewGroupCreate" hidden>
+          <div class="match-card create-card">
+            <h2>Buat Komunitas Belajar</h2>
+            <p class="sub">
+              Pilih minimal 2 teman. Dengan kamu, anggotanya minimal 3 orang.
+            </p>
+
+            <form id="createForm">
+              <label class="field-label" for="groupNameInput"
+                >Nama komunitas</label
+              >
+              <input
+                type="text"
+                id="groupNameInput"
+                class="text-input"
+                maxlength="40"
+                placeholder="contoh: Belajar Matematika"
+                autocomplete="off"
+              />
+
+              <label class="field-label">Pilih teman</label>
+              <div class="picker" id="pickerList"></div>
+              <p class="sub" id="pickerNote"></p>
+
+              <p class="error" id="createError"></p>
+              <button type="submit" id="createBtn" class="btn-primary">
+                Buat Komunitas
+              </button>
+              <button type="button" id="cancelCreateBtn" class="btn-secondary">
+                Batal
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Komunitas: chat grup -->
+        <div class="view" id="viewGroupChat" hidden>
+          <header class="chat-header">
+            <div class="friend-avatar group-mini" id="groupAvatar">?</div>
+            <div class="head-info">
+              <strong id="groupTitle"></strong>
+              <small id="groupMembers"></small>
+            </div>
+            <button type="button" id="leaveBtn" class="leave-btn">
+              Keluar
+            </button>
+          </header>
+
+          <div class="messages" id="groupMessages"></div>
+          <p class="error" id="groupError"></p>
+
+          <form class="chat-form" id="groupForm">
+            <input
+              type="text"
+              id="groupMessageInput"
+              maxlength="500"
+              placeholder="Tulis pesan..."
+              autocomplete="off"
+            />
+            <button type="submit">Kirim</button>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <div class="toast" id="toast" hidden></div>
     <script type="module" src="../../JS/home.js"></script>
+    <script type="module" src="../../JS/community.js"></script>
   </body>
 </html>
