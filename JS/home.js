@@ -342,16 +342,38 @@ async function tryMatch() {
     ),
   );
 
+  console.log(
+    "[match] hobiku:",
+    myInterests,
+    "| dokumen di antrean:",
+    snap.size,
+  );
+
   const now = Date.now();
   const candidates = [];
 
   snap.forEach((d) => {
-    if (d.id === currentUser.uid) return; // bukan diri sendiri
-    if (friendIds.has(d.id)) return; // sudah jadi teman
     const data = d.data();
-    if (data.matchedChatId) return; // sudah dapat pasangan
+    if (d.id === currentUser.uid) return; // bukan diri sendiri
+
+    if (friendIds.has(d.id)) {
+      console.log("[match] dilewati (sudah jadi teman):", data.alias);
+      return;
+    }
+    if (data.matchedChatId) {
+      console.log("[match] dilewati (sudah dapat pasangan):", data.alias);
+      return;
+    }
     const seen = data.lastSeen ? data.lastSeen.toMillis() : now;
-    if (now - seen > 60000) return; // sudah lama tidak aktif
+    if (now - seen > 60000) {
+      console.log(
+        "[match] dilewati (dianggap offline):",
+        data.alias,
+        Math.round((now - seen) / 1000),
+        "detik",
+      );
+      return;
+    }
 
     const shared = data.interests.filter((i) => myInterests.includes(i));
     candidates.push({
@@ -362,10 +384,10 @@ async function tryMatch() {
     });
   });
 
-  // Paling banyak hobi sama dulu (3, 2, 1). Kalau sama, urutannya acak.
   candidates.sort(
     (a, b) => b.shared.length - a.shared.length || a.rand - b.rand,
   );
+  console.log("[match] kandidat cocok:", candidates);
 
   for (const c of candidates) {
     const chatId = await claim(c);
