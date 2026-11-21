@@ -36,8 +36,6 @@ body {
 
 :root[data-theme="dark"] .profile-card {
   background: #0f1b2b;
-  border-color: #333;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
 [hidden] {
@@ -71,14 +69,6 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-:root[data-theme="dark"] .step::before {
-  content: "";
-  position: relative;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
 }
 
 :root[data-theme="dark"] .step {
@@ -125,7 +115,7 @@ body {
 }
 
 :root[data-theme="dark"] .step label {
-  color: rgba(92, 193, 222, 0.934);
+  color: whitesmoke;
 }
 
 .step input:not([type="radio"]):not([type="checkbox"]),
@@ -140,6 +130,11 @@ body {
   font-size: 14px;
   outline: none;
   transition: 0.25s ease;
+}
+:root[data-theme="dark"] .step textarea {
+  border-color: rgba(92, 193, 222, 0.934);
+  color: whitesmoke;
+  background: #0f1b2b;
 }
 .step input::placeholder,
 .step textarea::placeholder {
@@ -220,11 +215,17 @@ body {
 
   cursor: pointer;
 }
+:root[data-theme="dark"] .radio {
+  color: whitesmoke !important;
+}
 .radio input {
   width: 16px;
   height: 16px;
   accent-color: #c65b57;
   cursor: pointer;
+}
+:root [data-theme="dark"] .radio input {
+  accent-color: rgba(92, 193, 222, 0.934);
 }
 
 .step[data-step="2"] label {
@@ -255,6 +256,10 @@ body {
   font-weight: 500;
   transition: 0.2s ease;
 }
+:root[data-theme="dark"] .chip span {
+  border-color: rgba(92, 193, 222, 0.934);
+  color: rgba(92, 193, 222, 0.934);
+}
 .chip:hover span {
   background: rgba(225, 123, 113, 0.975);
   border-color: #c65b57;
@@ -263,6 +268,11 @@ body {
   background: rgba(225, 123, 113, 0.975);
   border-color: #c65b57;
   color: black;
+}
+:root[data-theme="dark"] .chip input:checked + span {
+  background: rgba(132, 224, 249, 0.934);
+  border-color: rgba(92, 193, 222, 0.934);
+  color: whitesmoke;
 }
 #otherBox {
   margin-top: 15px;
@@ -288,6 +298,10 @@ body {
   cursor: pointer;
   transition: 0.25s ease;
 }
+:root[data-theme="dark"] .nav-buttons button {
+  background: rgba(92, 193, 222, 0.934);
+  color: black;
+}
 .nav-buttons button:hover {
   transform: translateY(-2px);
   filter: brightness(1.05);
@@ -300,16 +314,26 @@ button.secondary {
   border: 1px solid #c65b57;
   color: #c65b57;
 }
+:root[data-theme="dark"] button.secondary {
+  background: #0f1b2b;
+  border: 1px solid rgba(92, 193, 222, 0.934);
+  color: rgba(92, 193, 222, 0.934);
+}
 button.secondary:hover {
   background: rgba(255, 255, 255, 0.2);
 }
-
+:root[data-theme="dark"] button.secondary:hover {
+  background: #0f1b2b;
+}
 .progress {
   height: 7px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50px;
   overflow: hidden;
   margin-top: 25px;
+}
+:root[data-theme="dark"] .progress {
+  background: #0f1b2b;
 }
 .progress-bar {
   height: 100%;
@@ -318,11 +342,17 @@ button.secondary:hover {
   border-radius: 50px;
   transition: width 0.35s ease;
 }
+:root[data-theme="dark"] .progress-bar {
+  background: rgba(92, 193, 222, 0.934);
+}
 .step-label {
   font-size: 12px;
   color: #c65b57;
   margin: 10px 0 0;
   text-align: right;
+}
+:root[data-theme="dark"] .step-label {
+  color: rgba(92, 193, 222, 0.934);
 }
 
 #message {
@@ -330,6 +360,9 @@ button.secondary:hover {
   font-size: 13px;
   margin-top: 12px;
   text-align: center;
+}
+:root[data-theme="dark"] #message {
+  color: rgba(92, 193, 222, 0.934);
 }
 
 @media (max-width: 600px) {
