@@ -20,6 +20,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { auth, db } from "./firebase-config.js";
 import { interestLabel } from "./interest.js";
+import { joinWaitingList } from "./waiting.js";
 
 // ====== ELEMEN HTML ======
 const $ = (id) => document.getElementById(id); // singkatan untuk getElementById
@@ -59,31 +60,29 @@ const searchAgainBtn = $("searchAgainBtn");
 const matchMessage = $("matchMessage");
 
 // ====== DATA YANG DISIMPAN SELAMA HALAMAN TERBUKA ======
-const NOTICE_DELAY = 10000; // notifikasi "belum ada yang cocok" muncul setelah 10 detik
-
 let currentUser = null;
 let myAlias = null;
 let myInterests = [];
 
 let friends = []; // semua chat milik user ini
 let friendIds = new Set(); // uid semua teman (supaya tidak dicocokkan dua kali)
-let currentChat = null; // chat yang sedang terbuka
+let currentChat = null;
 let unsubscribeMessages = null;
+let unsubscribeChats = null;
+let lastChatSeenAt = 0;
 let lastMatchedChatId = null;
 
 let searching = false;
-let pollTimer = null;
-let unsubscribeWait = null;
-let noticeTimer = null;
+let handlingMatch = false;
 let toastTimer = null;
 
 // ====== TAMPILAN ======
-function showToast(text, isError = false) {
+function showToast(text, isError = false, ms = 4000) {
   toast.textContent = text;
   toast.className = "toast" + (isError ? " error" : "");
   toast.hidden = false;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => (toast.hidden = true), 4000);
+  toastTimer = setTimeout(() => (toast.hidden = true), ms);
 }
 
 // Ganti isi panel kanan: "empty", "chat", atau "match"
@@ -113,6 +112,125 @@ function addTags(container, ids) {
   });
 }
 
+// ====== PENCOCOKAN ======
+
+async function tryMatch() {
+  const snap = await getDocs(
+    query(
+      collection(db, "waiting"),
+      where("interests", "array-contains-any", myInterests.slice(0, 30)),
+    ),
+  );
+
+  const now = Date.now();
+  const candidates = [];
+
+  snap.forEach((d) => {
+    const data = d.data();
+    if (d.id === currentUser.uid) return; // bukan diri sendiri
+    if (friendIds.has(d.id)) return; // sudah jadi teman
+
+    const shared = data.interests.filter((i) => myInterests.includes(i));
+    if (shared.length === 0) return;
+
+    candidates.push({
+      uid: d.id,
+      alias: data.alias,
+      shared,
+      waitingSince: data.createdAt ? data.createdAt.toMillis() : now,
+    });
+  });
+
+  // Hobi sama terbanyak dulu; kalau sama, yang paling lama menunggu didahulukan
+  candidates.sort(
+    (a, b) =>
+      b.shared.length - a.shared.length || a.waitingSince - b.waitingSince,
+  );
+
+  for (const c of candidates) {
+    const chatId = await claim(c);
+    if (chatId) return chatId;
+  }
+  return null;
+}
+
+// Buat chat dengan orang di waiting list. Orang itu TETAP di waiting list.
+// ID chat tetap (uid diurutkan) -> kalau chat-nya sudah ada, rules menolak
+// (karena hanya boleh create), jadi tidak mungkin ada chat ganda.
+async function claim(c) {
+  const chatId = [currentUser.uid, c.uid].sort().join("_");
+
+  try {
+    await setDoc(doc(db, "chats", chatId), {
+      members: [currentUser.uid, c.uid],
+      aliases: [myAlias, c.alias],
+      sharedInterests: c.shared,
+      createdBy: currentUser.uid,
+      createdAt: serverTimestamp(),
+    });
+    return chatId;
+  } catch (err) {
+    console.error("Gagal membuat chat:", err);
+    return null;
+  }
+}
+
+async function startSearch() {
+  if (searching) return;
+  searching = true;
+  matchMessage.textContent = "";
+  waitNotice.hidden = true;
+  showMatchBox("searching");
+
+  try {
+    const chatId = await tryMatch();
+    if (chatId) {
+      await handleMatched(chatId);
+      return;
+    }
+
+    // Belum ada yang cocok -> pastikan kita tetap ada di waiting list
+    await joinWaitingList(db, currentUser.uid, myAlias, myInterests);
+    waitNotice.hidden = false;
+  } catch (err) {
+    console.error(err);
+    showMatchBox("idle");
+    matchMessage.style.color = "red";
+    matchMessage.textContent = "Gagal mencari: " + err.message;
+  } finally {
+    searching = false;
+  }
+}
+
+// Dipanggil baik oleh orang yang mencari, maupun orang yang ditemukan
+async function handleMatched(chatId) {
+  if (handlingMatch) return;
+  handlingMatch = true;
+  lastMatchedChatId = chatId;
+
+  try {
+    await loadFriends(); // daftar teman otomatis bertambah
+
+    const chat = friends.find((c) => c.id === chatId);
+    if (chat) {
+      partnerAlias.textContent = partnerAliasOf(chat);
+      sharedText.textContent = `Kalian punya ${chat.sharedInterests.length} hobi yang sama:`;
+      addTags(sharedChips, chat.sharedInterests);
+      showToast(
+        "Kamu dapat teman baru: " +
+          partnerAliasOf(chat) +
+          " 🎉 Cek daftar Teman Chat!",
+      );
+    }
+    showMatchBox("result");
+  } catch (err) {
+    console.error(err);
+    showToast("Terjadi masalah: " + err.message, true);
+  } finally {
+    handlingMatch = false;
+  }
+}
+
 // ====== LOGIN & PROFIL ======
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -124,9 +242,13 @@ onAuthStateChanged(auth, async (user) => {
   try {
     const profileOk = await loadProfile();
     if (!profileOk) return;
-    await cleanupLeftover();
-    await loadFriends();
     showMain("empty");
+    watchChats(); // daftar teman + notifikasi teman baru (realtime)
+
+    // Pastikan user selalu ada di waiting list (termasuk user lama)
+    if (myInterests.length > 0) {
+      await joinWaitingList(db, currentUser.uid, myAlias, myInterests);
+    }
   } catch (err) {
     console.error(err);
     showToast("Gagal memuat data: " + err.message, true);
@@ -144,6 +266,7 @@ async function loadProfile() {
   }
 
   myAlias = data.alias;
+  lastChatSeenAt = data.lastChatSeenAt ? data.lastChatSeenAt.toMillis() : 0;
   myInterests = [...(data.interests || []), ...(data.customInterests || [])];
   aliasText.textContent = myAlias;
   addTags(myInterestsBox, myInterests);
@@ -157,16 +280,6 @@ async function loadProfile() {
   return true;
 }
 
-// Sisa antrean dari sesi sebelumnya (kalau tab sempat ditutup saat mencari).
-// Kalau sempat dicocokkan, chat-nya tetap ada di daftar teman.
-async function cleanupLeftover() {
-  try {
-    await deleteDoc(doc(db, "waiting", currentUser.uid));
-  } catch (err) {
-    console.error(err);
-  }
-}
-
 // ====== DAFTAR TEMAN ======
 const timeOf = (chat) => (chat.createdAt ? chat.createdAt.toMillis() : 0);
 
@@ -175,14 +288,7 @@ function partnerAliasOf(chat) {
   return chat.aliases[1 - myIndex];
 }
 
-async function loadFriends() {
-  const snap = await getDocs(
-    query(
-      collection(db, "chats"),
-      where("members", "array-contains", currentUser.uid),
-    ),
-  );
-
+function setFriendsFromSnap(snap) {
   friends = [];
   friendIds = new Set();
   snap.forEach((d) => {
@@ -195,6 +301,74 @@ async function loadFriends() {
 
   friends.sort((a, b) => timeOf(b) - timeOf(a)); // teman terbaru di atas
   renderFriends();
+}
+
+async function loadFriends() {
+  const snap = await getDocs(
+    query(
+      collection(db, "chats"),
+      where("members", "array-contains", currentUser.uid),
+    ),
+  );
+  setFriendsFromSnap(snap);
+}
+
+// Dengarkan chat milik kita. Kalau ada chat baru yang dibuat ORANG LAIN
+// (yaitu orang lain mencari dan menemukan kita), kasih tahu.
+// Ini jalan saat web terbuka, dan juga saat user baru login lagi.
+function watchChats() {
+  if (unsubscribeChats) unsubscribeChats();
+
+  unsubscribeChats = onSnapshot(
+    query(
+      collection(db, "chats"),
+      where("members", "array-contains", currentUser.uid),
+    ),
+    (snap) => {
+      setFriendsFromSnap(snap);
+
+      let newCount = 0;
+      let lastAlias = "";
+
+      snap.docChanges().forEach((change) => {
+        if (change.type !== "added") return;
+        const data = change.doc.data();
+
+        // abaikan chat lama (tanpa createdBy) dan chat yang kita buat sendiri
+        if (!data.createdBy || data.createdBy === currentUser.uid) return;
+
+        const created = data.createdAt ? data.createdAt.toMillis() : Date.now();
+        if (created <= lastChatSeenAt) return; // sudah pernah diberi tahu
+
+        newCount++;
+        lastAlias = partnerAliasOf(data);
+      });
+
+      if (newCount > 0) {
+        showToast(
+          newCount === 1
+            ? `Kamu dapat teman baru: ${lastAlias} 🎉`
+            : `Kamu dapat ${newCount} teman baru 🎉`,
+          false,
+          8000,
+        );
+        markChatsSeen();
+      }
+    },
+    (err) => console.error(err),
+  );
+}
+
+// Simpan "terakhir kali user diberi tahu" supaya notifikasi tidak muncul berulang
+async function markChatsSeen() {
+  lastChatSeenAt = Date.now();
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      lastChatSeenAt: serverTimestamp(),
+    });
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 function renderFriends() {
@@ -333,197 +507,6 @@ chatForm.addEventListener("submit", async (e) => {
   }
 });
 
-// ====== PENCOCOKAN ======
-async function tryMatch() {
-  const snap = await getDocs(
-    query(
-      collection(db, "waiting"),
-      where("interests", "array-contains-any", myInterests.slice(0, 30)),
-    ),
-  );
-
-  console.log(
-    "[match] hobiku:",
-    myInterests,
-    "| dokumen di antrean:",
-    snap.size,
-  );
-
-  const now = Date.now();
-  const candidates = [];
-
-  snap.forEach((d) => {
-    const data = d.data();
-    if (d.id === currentUser.uid) return; // bukan diri sendiri
-
-    if (friendIds.has(d.id)) {
-      console.log("[match] dilewati (sudah jadi teman):", data.alias);
-      return;
-    }
-    if (data.matchedChatId) {
-      console.log("[match] dilewati (sudah dapat pasangan):", data.alias);
-      return;
-    }
-    const seen = data.lastSeen ? data.lastSeen.toMillis() : now;
-    if (now - seen > 60000) {
-      console.log(
-        "[match] dilewati (dianggap offline):",
-        data.alias,
-        Math.round((now - seen) / 1000),
-        "detik",
-      );
-      return;
-    }
-
-    const shared = data.interests.filter((i) => myInterests.includes(i));
-    candidates.push({
-      uid: d.id,
-      alias: data.alias,
-      shared,
-      rand: Math.random(),
-    });
-  });
-
-  candidates.sort(
-    (a, b) => b.shared.length - a.shared.length || a.rand - b.rand,
-  );
-  console.log("[match] kandidat cocok:", candidates);
-
-  for (const c of candidates) {
-    const chatId = await claim(c);
-    if (chatId) return chatId;
-  }
-  return null;
-}
-
-// "Ambil" satu orang dari antrean. Pakai transaction supaya
-// satu orang tidak bisa diambil dua kali pada waktu yang sama.
-async function claim(c) {
-  const chatRef = doc(collection(db, "chats"));
-  const theirRef = doc(db, "waiting", c.uid);
-  const myRef = doc(db, "waiting", currentUser.uid);
-
-  try {
-    return await runTransaction(db, async (tx) => {
-      const theirSnap = await tx.get(theirRef);
-      const mySnap = await tx.get(myRef);
-
-      if (!theirSnap.exists() || theirSnap.data().matchedChatId) return null;
-      if (mySnap.exists() && mySnap.data().matchedChatId) return null;
-
-      tx.set(chatRef, {
-        members: [currentUser.uid, c.uid],
-        aliases: [myAlias, c.alias],
-        sharedInterests: c.shared,
-        createdAt: serverTimestamp(),
-      });
-      tx.update(theirRef, { matchedChatId: chatRef.id });
-      if (mySnap.exists()) tx.update(myRef, { matchedChatId: chatRef.id });
-
-      return chatRef.id;
-    });
-  } catch (err) {
-    console.error("Gagal claim:", err);
-    matchMessage.style.color = "red";
-    matchMessage.textContent = "Gagal mencocokkan: " + err.message;
-    return null;
-  }
-}
-
-async function startSearch() {
-  searching = true;
-  matchMessage.textContent = "";
-  showMatchBox("searching");
-
-  waitNotice.hidden = true;
-  noticeTimer = setTimeout(() => {
-    if (searching) waitNotice.hidden = false;
-  }, NOTICE_DELAY);
-
-  try {
-    // 1. Coba langsung cocokkan dengan yang sudah menunggu
-    const chatId = await tryMatch();
-    if (chatId) {
-      await onMatched(chatId);
-      return;
-    }
-
-    // 2. Tidak ada yang cocok -> masuk antrean
-    const myRef = doc(db, "waiting", currentUser.uid);
-    await setDoc(myRef, {
-      uid: currentUser.uid,
-      alias: myAlias,
-      interests: myInterests,
-      matchedChatId: null,
-      createdAt: serverTimestamp(),
-      lastSeen: serverTimestamp(),
-    });
-
-    // 3. Kalau ada orang lain yang mencocokkan kita, kita langsung tahu
-    unsubscribeWait = onSnapshot(myRef, (snap) => {
-      if (snap.exists() && snap.data().matchedChatId) {
-        onMatched(snap.data().matchedChatId);
-      }
-    });
-
-    // 4. Tiap 8 detik: tandai masih aktif + coba cari lagi
-    pollTimer = setInterval(async () => {
-      if (!searching) return;
-      try {
-        await updateDoc(myRef, { lastSeen: serverTimestamp() });
-        const id = await tryMatch();
-        if (id) await onMatched(id);
-      } catch (err) {
-        console.error(err);
-      }
-    }, 8000);
-  } catch (err) {
-    console.error(err);
-    searching = false;
-    stopSearchTimers();
-    showMatchBox("idle");
-    matchMessage.style.color = "red";
-    matchMessage.textContent = "Gagal mencari: " + err.message;
-  }
-}
-
-function stopSearchTimers() {
-  if (pollTimer) clearInterval(pollTimer);
-  if (unsubscribeWait) unsubscribeWait();
-  if (noticeTimer) clearTimeout(noticeTimer);
-  pollTimer = null;
-  unsubscribeWait = null;
-  noticeTimer = null;
-  waitNotice.hidden = true;
-}
-
-async function onMatched(chatId) {
-  if (!searching) return; // sudah diproses
-  searching = false;
-  stopSearchTimers();
-  lastMatchedChatId = chatId;
-
-  try {
-    await loadFriends(); // daftar teman otomatis bertambah
-
-    const chat = friends.find((c) => c.id === chatId);
-    if (chat) {
-      partnerAlias.textContent = partnerAliasOf(chat);
-      sharedText.textContent = `Kalian punya ${chat.sharedInterests.length} hobi yang sama:`;
-      addTags(sharedChips, chat.sharedInterests);
-      if (viewMatch.hidden) {
-        showToast("Kamu dapat teman baru: " + partnerAliasOf(chat) + " 🎉");
-      }
-    }
-    showMatchBox("result");
-
-    await deleteDoc(doc(db, "waiting", currentUser.uid)); // keluar dari antrean
-  } catch (err) {
-    console.error(err);
-    showToast("Terjadi masalah: " + err.message, true);
-  }
-}
-
 // ====== TOMBOL & MENU ======
 menuChat.addEventListener("click", () =>
   showMain(currentChat ? "chat" : "empty"),
@@ -532,16 +515,7 @@ menuMatch.addEventListener("click", () => showMain("match"));
 
 findBtn.addEventListener("click", startSearch);
 
-cancelBtn.addEventListener("click", async () => {
-  searching = false;
-  stopSearchTimers();
-  try {
-    await deleteDoc(doc(db, "waiting", currentUser.uid));
-  } catch (err) {
-    console.error(err);
-  }
-  showMatchBox("idle");
-});
+cancelBtn.addEventListener("click", () => showMatchBox("idle"));
 
 openChatBtn.addEventListener("click", () => {
   if (lastMatchedChatId) openChat(lastMatchedChatId);
@@ -552,11 +526,4 @@ searchAgainBtn.addEventListener("click", () => showMatchBox("idle"));
 
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth); // setelah ini onAuthStateChanged mengarahkan ke login
-});
-
-// Usaha terbaik: keluar dari antrean kalau tab ditutup
-window.addEventListener("beforeunload", () => {
-  if (searching && currentUser) {
-    deleteDoc(doc(db, "waiting", currentUser.uid));
-  }
 });

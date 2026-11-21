@@ -7,6 +7,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { auth, db } from "./firebase-config.js";
 import { INTEREST_OPTIONS } from "./interest.js";
+import { joinWaitingList } from "./waiting.js";
 
 const form = document.getElementById("profileForm");
 const message = document.getElementById("message");
@@ -157,8 +158,11 @@ form.addEventListener("submit", async (e) => {
       { merge: true },
     );
 
-    message.style.color = "green";
-    message.textContent = "Profil berhasil disimpan!";
+    await joinWaitingList(db, currentUser.uid, currentAlias, [
+      ...interests,
+      ...customInterests,
+    ]);
+
     message.style.color = "green";
     message.textContent = "Profil berhasil disimpan! Mengalihkan...";
     setTimeout(() => {

@@ -11,7 +11,8 @@ body {
   padding: 16px;
   font-family: "Plus Jakarta Sans", Arial, sans-serif;
   color: #222;
-  background: linear-gradient(135deg, #c65b57, #3ec6e0);
+  background: url("../../Gambar/download\ \(1\).gif") no-repeat bottom center /
+    cover;
 }
 
 .app {
@@ -88,6 +89,12 @@ body {
 .side-item.active {
   background: #fff;
   color: #c65b57;
+}
+.side-item svg {
+  stroke: #ffffff;
+}
+.side-item.active svg {
+  stroke: #c65b57;
 }
 .side-item:disabled {
   opacity: 0.6;
@@ -236,6 +243,9 @@ body {
 .empty-view p {
   margin: 0;
   font-size: 14px;
+}
+.big svg {
+  stroke: #c65b57;
 }
 
 /* Chat */
@@ -507,7 +517,7 @@ body {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #c65b57, #3ec6e0);
+  background: #c65b57;
   color: #fff;
   display: flex;
   align-items: center;
@@ -549,6 +559,10 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.view .empty svg {
+  stroke: #c65b57;
 }
 
 /* Form buat komunitas */
@@ -640,4 +654,38 @@ body {
   font-size: 11px;
   font-weight: 700;
   color: #c65b57;
+}
+
+/* ===== PERBAIKAN UKURAN FOTO PROFIL ===== */
+
+/* Foto profil sendiri di sidebar */
+.me-avatar {
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.me-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Foto profil teman di daftar teman dan header chat */
+.friend-avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.friend-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
 }
