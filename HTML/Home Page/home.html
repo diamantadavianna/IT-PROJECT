@@ -105,6 +105,25 @@
             Komunitas
           </button>
         </nav>
+        <button type="button" class="side-item" id="menuSettings">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#9b9a97"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"
+            />
+            <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+          </svg>
+          Pengaturan
+        </button>
 
         <button type="button" id="logoutBtn" class="logout">Keluar</button>
       </aside>
@@ -237,6 +256,56 @@
             </section>
 
             <p id="matchMessage"></p>
+          </div>
+        </div>
+
+        <!-- Tampilan: pengaturan -->
+        <div class="view match-view" id="viewSettings" hidden>
+          <div class="match-card settings-card">
+            <h2>Pengaturan</h2>
+
+            <h3 class="settings-title">Tampilan</h3>
+            <div class="settings-options">
+              <label class="settings-option">
+                <input type="radio" name="themeMode" value="auto" />
+                <span>Otomatis (sesuai jam)</span>
+              </label>
+              <label class="settings-option">
+                <input type="radio" name="themeMode" value="light" />
+                <span>Terang</span>
+              </label>
+              <label class="settings-option">
+                <input type="radio" name="themeMode" value="dark" />
+                <span>Gelap</span>
+              </label>
+            </div>
+
+            <div id="autoThemeBox">
+              <p class="sub">Atur jam untuk mode otomatis (format 0-23):</p>
+              <div class="settings-row">
+                <label for="lightStartInput">Mulai terang jam</label>
+                <input
+                  type="number"
+                  id="lightStartInput"
+                  class="text-input"
+                  min="0"
+                  max="23"
+                />
+              </div>
+              <div class="settings-row">
+                <label for="darkStartInput">Mulai gelap jam</label>
+                <input
+                  type="number"
+                  id="darkStartInput"
+                  class="text-input"
+                  min="0"
+                  max="23"
+                />
+              </div>
+              <button type="button" id="resetThemeBtn" class="btn-secondary">
+                Kembalikan ke default (06.00 - 18.00)
+              </button>
+            </div>
           </div>
         </div>
 

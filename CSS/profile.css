@@ -60,7 +60,7 @@ body {
   animation: fadeIn 0.3s ease;
 }
 
-. @keyframes fadeIn {
+@keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -74,7 +74,7 @@ body {
 :root[data-theme="dark"] .step {
   position: relative;
   z-index: 1;
-  background: #152339;
+  background: #0f1b2b;
 }
 
 .step h1 {
@@ -105,7 +105,9 @@ body {
   margin-bottom: 15px;
   font-size: 13px;
 }
-
+:root [data-theme="dark"] .step small {
+  color: rgba(92, 193, 222, 0.934);
+}
 .step label {
   display: block;
   color: black;
@@ -113,7 +115,6 @@ body {
   font-weight: 600;
   margin-bottom: 9px;
 }
-
 :root[data-theme="dark"] .step label {
   color: whitesmoke;
 }
@@ -123,7 +124,8 @@ body {
   width: 100%;
   min-width: 0;
   padding: 14px 20px;
-  border: 2px solid #c65b57;
+  border: 2px solid;
+  border-color: #c65b57;
   border-radius: 50px;
   background: rgba(255, 255, 255, 0.04);
   color: black;

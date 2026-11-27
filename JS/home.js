@@ -58,6 +58,16 @@ const sharedChips = $("sharedChips");
 const openChatBtn = $("openChatBtn");
 const searchAgainBtn = $("searchAgainBtn");
 const matchMessage = $("matchMessage");
+const menuSettings = $("menuSettings");
+const viewSettings = $("viewSettings");
+const autoThemeBox = $("autoThemeBox");
+const lightStartInput = $("lightStartInput");
+const darkStartInput = $("darkStartInput");
+const resetThemeBtn = $("resetThemeBtn");
+const friendPanel = document.querySelector(".list-panel:not(#communityPanel)");
+const communityPanel = $("communityPanel");
+const menuCommunity = $("menuCommunity");
+const groupViewIds = ["viewGroupEmpty", "viewGroupCreate", "viewGroupChat"];
 
 // ====== DATA YANG DISIMPAN SELAMA HALAMAN TERBUKA ======
 let currentUser = null;
@@ -87,11 +97,19 @@ function showToast(text, isError = false, ms = 4000) {
 
 // Ganti isi panel kanan: "empty", "chat", atau "match"
 function showMain(name) {
+  // Tutup semua tampilan Komunitas, balik ke daftar teman
+  groupViewIds.forEach((id) => ($(id).hidden = true));
+  communityPanel.hidden = true;
+  friendPanel.hidden = false;
+  menuCommunity.classList.remove("active");
+
   viewEmpty.hidden = name !== "empty";
   viewChat.hidden = name !== "chat";
   viewMatch.hidden = name !== "match";
-  menuChat.classList.toggle("active", name !== "match");
+  viewSettings.hidden = name !== "settings";
+  menuChat.classList.toggle("active", name === "empty" || name === "chat");
   menuMatch.classList.toggle("active", name === "match");
+  menuSettings.classList.toggle("active", name === "settings");
 }
 
 // Ganti bagian di dalam halaman Cari Teman: "idle", "searching", atau "result"
@@ -523,6 +541,49 @@ openChatBtn.addEventListener("click", () => {
 });
 
 searchAgainBtn.addEventListener("click", () => showMatchBox("idle"));
+
+// ====== PENGATURAN ======
+function renderThemeSettings() {
+  const s = window.ThemeSettings.get();
+  document.querySelector(`input[name="themeMode"][value="${s.mode}"]`).checked =
+    true;
+  lightStartInput.value = s.lightStart;
+  darkStartInput.value = s.darkStart;
+  autoThemeBox.hidden = s.mode !== "auto";
+}
+
+document.querySelectorAll('input[name="themeMode"]').forEach((radio) => {
+  radio.addEventListener("change", () => {
+    window.ThemeSettings.set({ mode: radio.value });
+    autoThemeBox.hidden = radio.value !== "auto";
+  });
+});
+
+function onHourChange(input, key) {
+  const hour = parseInt(input.value, 10);
+  if (Number.isNaN(hour) || hour < 0 || hour > 23) {
+    renderThemeSettings(); // input tidak valid -> kembalikan nilai lama
+    return;
+  }
+  window.ThemeSettings.set({ [key]: hour });
+}
+lightStartInput.addEventListener("change", () =>
+  onHourChange(lightStartInput, "lightStart"),
+);
+darkStartInput.addEventListener("change", () =>
+  onHourChange(darkStartInput, "darkStart"),
+);
+
+resetThemeBtn.addEventListener("click", () => {
+  window.ThemeSettings.reset();
+  renderThemeSettings();
+  showToast("Pengaturan tema dikembalikan ke default");
+});
+
+menuSettings.addEventListener("click", () => {
+  renderThemeSettings();
+  showMain("settings");
+});
 
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth); // setelah ini onAuthStateChanged mengarahkan ke login
